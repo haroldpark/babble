@@ -10,11 +10,23 @@ server.listen(port, function () {
 
 app.use(express.static(__dirname + '/public'));
 
-var numUsers = 0;
+var participantNum = 0;
+var userAdded = false;
 
 io.on('connection', function (socket) {
   socket.emit('connected');
-  socket.on('user joined', function (data) {
 
+
+  socket.on('user joined', function (username) {
+    ++participantNum;
+    userAdded = true;
+    socket.emit('enter room', participantNum);
+    socket.broadcast.emit('user joined', {username: username, participantNum: participantNum});
+  })
+
+  socket.on('disconnect', function (username) {
+    if (userAdded) {
+      --participantNum;
+    }
   })
 });

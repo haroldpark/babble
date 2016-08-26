@@ -10,6 +10,7 @@ $(function() {
   var $logs = $('.logs');
   // Prompt for setting a username
   var username;
+  var userJoined = false;
   var $currentInput = $usernameInput.focus();
 
   var socket = io();
@@ -25,19 +26,37 @@ console.log('number', number)
 
 
   socket.on('enter room', function (number) {
-    console.log('HLOOLEOL')
+    console.log('HELLO')
     updateParticipantNum(number);
+
+    $('.chatArea').click(function (e) {
+      $('#newInput').empty().remove();
+      var widthOfContainer = $(this).width();
+      var x_coordinate = widthOfContainer - e.pageX;
+      var style = 'position: absolute; right:' + x_coordinate + 'px; top:' + e.pageY + 'px;';
+      var inputTag = '<div id="newInput" style="' +  style +'"><input type="text"/></div>';
+      $('.chatArea').append(inputTag)
+    })
   });
 
   socket.on('connected', function () {
-
     $window.keydown(function (event) {
       if(event.which === 13) {
-        var username = $usernameInput.val();
-        $loginPage.fadeOut();
-        // $chatPage.show();
-        $currentInput = $inputMessage.focus();
-        socket.emit('user joined', username);
+        if ($currentInput.val().length > 0) {
+          if (!userJoined) {
+            var username = $usernameInput.val();
+            // $chatPage.show();
+            socket.emit('user joined', username);
+            $loginPage.fadeOut();
+            $currentInput = $inputMessage.focus();
+          }
+
+          if (userJoined) {
+
+          }
+        }
+
+
       }
     })
   });

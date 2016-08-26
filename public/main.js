@@ -32,8 +32,9 @@ console.log('number', number)
     $('.chatArea').click(function (e) {
       $('#newInput').empty().remove();
       var widthOfContainer = $(this).width();
-      var x_coordinate = widthOfContainer - e.pageX;
-      var style = 'position: absolute; right:' + x_coordinate + 'px; top:' + e.pageY + 'px;';
+      var x_coordinate = e.pageX;
+      console.log(widthOfContainer, x_coordinate);
+      var style = 'position: absolute; left:' + x_coordinate + 'px; top:' + e.pageY + 'px;';
       var inputTag = '<div id="newInput" style="' +  style +'"><input type="text"/></div>';
       $('.chatArea').append(inputTag)
     })

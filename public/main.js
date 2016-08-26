@@ -63,13 +63,17 @@ console.log('number', number)
   });
 
   socket.on('user joined', function (data) {
-    console.log('HERHIRE')
     var message = data.username + ' has joined!';
-    console.log(message);
     updateParticipantNum(data.participantNum);
-    $logs.append('<li>' + message + '</li>')
+    $logs.append('<li>' + message + '</li>');
 
   });
+
+  socket.on('user left', function (data) {
+    var message = data.username + ' has left!';
+    updateParticipantNum(data.participantNum);
+    $logs.append('<li>' + message + '</li>');
+  })
 
 
 

@@ -20,14 +20,16 @@ io.on('connection', function (socket) {
   socket.on('user joined', function (username) {
     ++participantNum;
     userAdded = true;
+    socket.username = username;
     socket.emit('enter room', participantNum);
     socket.broadcast.emit('user joined', {username: username, participantNum: participantNum});
   })
 
-  socket.on('disconnect', function (username) {
+  socket.on('disconnect', function () {
     if (userAdded) {
       --participantNum;
     }
     userAdded = false;
+    socket.broadcast.emit('user left', {username: socket.username, participantNum: participantNum});
   })
 });

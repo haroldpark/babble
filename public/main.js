@@ -4,9 +4,9 @@ $(function() {
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
-  var $inputMessage = $('.inputMessage'); // Input message input box
+  var $newInput = $('#newInput'); // Input box that appears on screen on click
   var $loginPage = $('.loginPage'); // The login page
-  var $chatPage = $('.chatPage'); // The chatroom page
+  var $chatArea = $('.chatArea'); // The chatroom page
   var $logs = $('.logs');
   // Prompt for setting a username
   var username;
@@ -20,41 +20,65 @@ $(function() {
   // })
 
   function updateParticipantNum (number) {
-console.log('number', number)
     $('#numOfUsers').text(number);
   }
 
+  function addMessageToScreen (data) {
 
-  socket.on('enter room', function (number) {
-    console.log('HELLO')
+  }
+  function removeNewInputElement () {
+    $('#newInput').closest('div').remove()
+    $('#newInput').remove();
+  }
+  //main functionalities of user in chatroom
+  socket.on('entered room', function (number) {
     updateParticipantNum(number);
+    var x_coordinate;
+    var y_coordinate;
 
     $('.chatArea').click(function (e) {
-      $('#newInput').empty().remove();
-      var widthOfContainer = $(this).width();
-      var x_coordinate = e.pageX;
-      console.log(widthOfContainer, x_coordinate);
-      var style = 'position: absolute; left:' + x_coordinate + 'px; top:' + e.pageY + 'px;';
-      var inputTag = '<div id="newInput" style="' +  style +'"><input type="text"/></div>';
-      $('.chatArea').append(inputTag)
-    })
+      removeNewInputElement();
+      x_coordinate = e.pageX;
+      y_coordinate = e.pageY;
+      var style = 'position: absolute; left:' + x_coordinate + 'px; top:' + y_coordinate + 'px;';
+      var inputTag = '<div style="' +  style +'"><input id="newInput" type="text"/></div>';
+      $('.chatArea').append(inputTag);
+
+      $('#newInput').focus();
+    });
+
+      $window.keydown(function (event) {
+        if(event.which === 13) {
+          var value = $('#newInput').val();
+          if (value.length > 0) {
+            if (userJoined) {
+              var style = 'position:absolute; left:' + x_coordinate + 'px; top:' + y_coordinate + 'px;">'
+              var inputTag = '<p style="' + style + value + '</p>';
+              console.log(inputTag);
+              $chatArea.append(inputTag);
+              removeNewInputElement();
+              socket.emit('message sent', messageProps);
+            }
+          }
+        }
+      })
   });
+
 
   socket.on('connected', function () {
     $window.keydown(function (event) {
       if(event.which === 13) {
-        if ($currentInput.val().length > 0) {
+        var value = $usernameInput.val();
+        if (value.length > 0) {
           if (!userJoined) {
             var username = $usernameInput.val();
-            // $chatPage.show();
             socket.emit('user joined', username);
             $loginPage.fadeOut();
-            $currentInput = $inputMessage.focus();
+            $currentInput = $newInput.focus();
+            userJoined = true;
           }
 
-          if (userJoined) {
 
-          }
         }
 
 

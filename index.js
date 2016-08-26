@@ -21,7 +21,7 @@ io.on('connection', function (socket) {
     ++participantNum;
     userAdded = true;
     socket.username = username;
-    socket.emit('enter room', participantNum);
+    socket.emit('entered room', participantNum);
     socket.broadcast.emit('user joined', {username: username, participantNum: participantNum});
   })
 

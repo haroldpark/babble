@@ -25,6 +25,10 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('user joined', {username: username, participantNum: participantNum});
   })
 
+  socket.on('message sent', function (messageElement) {
+    socket.broadcast.emit('message received', messageElemnt);
+  })
+
   socket.on('disconnect', function () {
     if (userAdded) {
       --participantNum;

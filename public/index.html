@@ -6,32 +6,30 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <ul class="pages">
-    <li class="chat page">
+    <div class="chatPage">
       <div class="chatArea">
         <ul class="messages"></ul>
-
-        <div id="example"><input type="text">KEK</div>
       </div>
 
-      <input class="inputMessage" placeholder="Type here..."/>
+      <!-- <input class="inputMessage" placeholder="Type here..."/> -->
 
       <div class="logArea">
         <ul class="logs">
           <li># of users in this chat:</li><p id="numOfUsers"></p>
         </ul>
       </div>
-    </li>
-    <li class="login page">
+    </div>
+    <div class="loginPage">
       <div class="form">
-        <h3 class="title">What's your nickname?</h3>
+        <h3 class="title">Type in your username</h3>
         <input class="usernameInput" type="text" maxlength="14" />
       </div>
-    </li>
-  </ul>
+    </div>
 
+
+
+</body>
   <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/main.js"></script>
-</body>
 </html>

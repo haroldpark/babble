@@ -28,5 +28,6 @@ io.on('connection', function (socket) {
     if (userAdded) {
       --participantNum;
     }
+    userAdded = false;
   })
 });

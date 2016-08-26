@@ -5,8 +5,8 @@ $(function() {
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
   var $inputMessage = $('.inputMessage'); // Input message input box
-  var $loginPage = $('.login.page'); // The login page
-  var $chatPage = $('.chat.page'); // The chatroom page
+  var $loginPage = $('.loginPage'); // The login page
+  var $chatPage = $('.chatPage'); // The chatroom page
   var $logs = $('.logs');
   // Prompt for setting a username
   var username;

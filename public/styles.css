@@ -1,6 +1,54 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.loginPage {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: green;
+  text-align: center;
+}
+
+.loginPage:before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
+}
+
+.form {
+  display: inline-block;
+}
+
+/*---Chat page---*/
+.chatPage {
+  position: absolute;
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: yellow;
+}
+
 .chatArea {
-  width: 700px;
-  height: 700px;
+  float: left;
+  width: 80%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.logArea {
+  float: right;
+  width: 20%;
+  height: 100%;
+  display: inline-block;
 }
 /*#example {
   position: absolute;
@@ -8,3 +56,10 @@
 
   top: 100px;
 }*/
+
+div {
+  border-width: 1px;
+  margin: -1px;
+  border-color: black;
+  border-style: dashed;
+}

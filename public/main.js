@@ -22,21 +22,20 @@ $(function() {
     $('#newInput').remove();
   }
 
-  function addElementToChatArea (tagName, x_coord, y_coord, value) {
-    var extraFields = ' ';
-    var endingTag = '';
-    var value = value || '';
-    if (tagName == 'input') {
-      extraFields = ' id="newInput" type="text"'
-    }
-    if (tagName == 'p') {
-      endingTag = '</' + tagName + '>';
-    }
-    var style = 'position:absolute; left:' + x_coord + 'px; top:' + y_coord + 'px;">';
-    var element = '<' + tagName + extraFields + ' style="' + style + value + endingTag;
-    console.log('element', element)
-    $chatArea.append(element);
-    return element;
+  function formatInlineStyle (x_coord, y_coord) {
+    return '"position:absolute; left:' + x_coord + 'px; top:' + y_coord + 'px;"';
+  }
+  function addInputToChatArea (style) {
+    console.log('WERE AREAR EATHE CHATPINGON')
+
+    var element = '<input id="newInput" style=' + style + '/>';
+    $(element).appendTo($chatArea);
+  }
+  function addMessageToChatArea (style, value, username) {
+    var element = '<p style=' + style + '>' + username + ': ' + value + '</p>';
+    //limits the seconds that the messages persists in to 6 seconds
+    var msecondsPersist = Math.min(value.length * 300, 6000);
+    $(element).appendTo($chatArea).delay(msecondsPersist).fadeOut();
   }
 
   //main functionalities of user in chatroom
@@ -48,12 +47,14 @@ $(function() {
   socket.on('connected', function () {
     var x_coordinate;
     var y_coordinate;
+    var username;
 
     $('.chatArea').click(function (e) {
       removeNewInputElement();
       x_coordinate = e.pageX;
       y_coordinate = e.pageY;
-      addElementToChatArea('input', x_coordinate, y_coordinate);
+
+      addInputToChatArea(formatInlineStyle(x_coordinate, y_coordinate));
       $('#newInput').focus();
     });
 
@@ -63,7 +64,7 @@ $(function() {
           var value = $usernameInput.val();
           console.log('THIS SHOUDLNT BE RUNNING HERE')
           if (value.length > 0) {
-            var username = $usernameInput.val();
+            username = $usernameInput.val();
             socket.emit('user joined', username);
             $loginPage.fadeOut();
             // $currentInput = $newInput.focus();
@@ -75,9 +76,14 @@ $(function() {
           var value = $('#newInput').val();
           if (value.length > 0) {
             if (userJoined) {
-              var pElement = addElementToChatArea('p', x_coordinate, y_coordinate, value);
+              addMessageToChatArea(formatInlineStyle(x_coordinate, y_coordinate), value, username);
               removeNewInputElement();
-              socket.emit('message sent', pElement);
+              socket.emit('message sent', {
+                x_coordinate: x_coordinate,
+                y_coordinate: y_coordinate,
+                value: value,
+                username: username
+              });
             }
           }
         }
@@ -85,8 +91,8 @@ $(function() {
     })
   });
 
-  socket.on('message received', function (element) {
-    $chatArea.append(element);
+  socket.on('message received', function (data) {
+    addMessageToChatArea(data.x_coordinate, data.y_coordinate, data.value, data.username)
   });
 
   socket.on('user joined', function (data) {

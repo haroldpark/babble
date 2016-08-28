@@ -57,9 +57,14 @@ iframe {
 }
 
 .ytUrlContainer {
-  width: 100%;
   position: absolute;
   bottom: 0;
+  text-align: center;
+}
+
+.ytUrlInput {
+  box-sizing: border-box;
+  display: inline-block;
 }
 /*#example {
   position: absolute;

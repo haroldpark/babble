@@ -38,11 +38,20 @@ $(function() {
     $(element).appendTo($chatArea).delay(msecondsPersist).fadeOut();
   }
 
+
+  function formatYTUrl (path) {
+      return '//www.youtube.com/embed/' + path + '?autoplay=1&controls=0&showinfo=0';
+  }
+
+  function ytUrlIdentification(url) {
+    var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    return (url.match(p)) ? RegExp.$1 : false;
+  }
+
   //main functionalities of user in chatroom
   socket.on('entered room', function (number) {
     updateParticipantNum(number);
   });
-
 
   socket.on('connected', function () {
     var x_coordinate;
@@ -53,30 +62,36 @@ $(function() {
       removeNewInputElement();
       x_coordinate = e.pageX;
       y_coordinate = e.pageY;
-
       addInputToChatArea(formatInlineStyle(x_coordinate, y_coordinate));
       $('#newInput').focus();
     });
 
-
-    $('.ytUrlInput').focusin(function () {
-      var that = this;
-      $window.keydown(function (event) {
-        if(event.which === 16) {
-          var youtubeLink = that.value;
-          console.log(youtubeLink)
-          $('iframe').attr('src', youtubeLink + '?autoplay=1&controls=0&showinfo=0');
-        }
-      });
-
-
+    $('#sendYtUrl').click(function () {
+      var validatedPath = ytUrlIdentification($('.ytUrlInput').val());
+      if (validatedPath) {
+        var formattedUrl = formatYTUrl(validatedPath);
+        $('iframe').attr('src', formattedUrl);
+        $('.ytUrlInput').val('');
+      }
     });
+
+    $('.usernameInput').focusin(function() {
+      if(event.which === 13) {
+        var value = $usernameInput.val();
+        if (value.length > 0) {
+          username = $usernameInput.val();
+          socket.emit('user joined', username);
+          $loginPage.fadeOut();
+          userJoined = true;
+        }
+      }
+    });
+
 
     $window.keydown(function (event) {
       if (!userJoined) {
         if(event.which === 13) {
           var value = $usernameInput.val();
-          console.log('THIS SHOUDLNT BE RUNNING HERE')
           if (value.length > 0) {
             username = $usernameInput.val();
             socket.emit('user joined', username);

@@ -42,6 +42,11 @@ html, body {
   height: 100%;
   top: 0;
   left: 0;
+  z-index: 10;
+}
+
+iframe {
+  pointer-events: none;
 }
 
 .logArea {
@@ -49,6 +54,12 @@ html, body {
   width: 20%;
   height: 100%;
   display: inline-block;
+}
+
+.ytUrlContainer {
+  width: 100%;
+  position: absolute;
+  bottom: 0;
 }
 /*#example {
   position: absolute;

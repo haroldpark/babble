@@ -34,7 +34,7 @@ $(function() {
   function addMessageToChatArea (style, value, username) {
     var element = '<p style=' + style + '>' + username + ': ' + value + '</p>';
     //limits the seconds that the messages persists in to 6 seconds
-    var msecondsPersist = Math.min(value.length * 300, 6000);
+    var msecondsPersist = Math.min(value.length * 400, 5000);
     $(element).appendTo($chatArea).delay(msecondsPersist).fadeOut();
   }
 
@@ -56,6 +56,20 @@ $(function() {
 
       addInputToChatArea(formatInlineStyle(x_coordinate, y_coordinate));
       $('#newInput').focus();
+    });
+
+
+    $('.ytUrlInput').focusin(function () {
+      var that = this;
+      $window.keydown(function (event) {
+        if(event.which === 16) {
+          var youtubeLink = that.value;
+          console.log(youtubeLink)
+          $('iframe').attr('src', youtubeLink + '?autoplay=1&controls=0&showinfo=0');
+        }
+      });
+
+
     });
 
     $window.keydown(function (event) {

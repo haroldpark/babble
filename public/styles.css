@@ -42,11 +42,13 @@ html, body {
   height: 100%;
   top: 0;
   left: 0;
-  z-index: 10;
+  position: relative;
 }
 
 iframe {
   pointer-events: none;
+  border: none;
+  z-index: -1;
 }
 
 .logArea {
@@ -66,12 +68,25 @@ iframe {
   box-sizing: border-box;
   display: inline-block;
 }
+
+#newInput, #newMsg {
+  width: 100px;
+  word-wrap: break-word;
+}
+
 /*#example {
   position: absolute;
   right: 10px;
 
   top: 100px;
 }*/
+
+
+
+#newInput {
+  resize: vertical;
+  max-height: 100px;
+}
 
 div {
   border-width: 1px;

@@ -1,4 +1,8 @@
 $(function() {
+  var TEXT_AREA_MAXLENGTH = 200;
+  var MAXIMUM_MSGINPUT_HEIGHT = 36;
+  var MAXIMUM_MSGINPUT_WIDTH = 106;
+
 
   // Initialize variables
   var $window = $(window);
@@ -22,21 +26,71 @@ $(function() {
     $('#newInput').remove();
   }
 
-  function formatInlineStyle (x_coord, y_coord) {
-    return '"position:absolute; left:' + x_coord + 'px; top:' + y_coord + 'px;"';
+  function formatInlineStyle (x_coord, y_coord, dimensionsArray) {
+    var inlinePositioning = preventInputOverflow(x_coord, y_coord, dimensionsArray);
+    return 'position:absolute; ' + inlinePositioning;
   }
-  function addInputToChatArea (style) {
-    console.log('WERE AREAR EATHE CHATPINGON')
 
-    var element = '<input id="newInput" style=' + style + '/>';
-    $(element).appendTo($chatArea);
+  function preventInputOverflow (x_coord, y_coord, dimensionsArray) {
+    var chatAreaWidth = $chatArea.outerWidth();
+    var chatAreaHeight = $chatArea.outerHeight();
+    var elementWidth = dimensionsArray[0];
+    var elementHeight = dimensionsArray[1];
+    var widthOverflow = x_coord + elementWidth > chatAreaWidth;
+    var heightOverflow = y_coord + elementHeight > chatAreaHeight;
+
+    console.log('WIDTHOVERFLOW', widthOverflow);
+    console.log('HEIGHTOVERFLOW', heightOverflow);
+
+
+    if (widthOverflow && heightOverflow) {
+      return 'bottom: 0px; right: 0px;';
+    }
+    if (widthOverflow) {
+      return 'right: 0px; top: ' + y_coord + 'px';
+    }
+    if (heightOverflow) {
+      return 'bottom: 0px; left: ' + x_coord + 'px';
+    }
+
+    return 'left:' + x_coord + 'px; top:' + y_coord + 'px';
   }
-  function addMessageToChatArea (style, value, username) {
-    var element = '<p style=' + style + '>' + username + ': ' + value + '</p>';
+
+
+  function getElementDimensions (element) {
+    var elementWidth = element.outerWidth();
+    var elementHeight = element.outerHeight();
+    console.log('WIDTH AND HEIGHT', elementWidth, elementHeight)
+    return [elementWidth, elementHeight];
+  }
+
+  function addInputToChatArea (x_coord, y_coord) {
+    //Checks if click coordinates are in the zone where overflow may happen
+    var element = '<textarea id="newInput" maxlength="' + TEXT_AREA_MAXLENGTH + '"/>';
+    var input = $(element).appendTo($chatArea).css('display', 'none');
+    var dimensions = getElementDimensions(input);
+
+    var style = formatInlineStyle(x_coord, y_coord, dimensions);
+
+    input.css('display', 'inline').attr('style', style);
+
+  }
+
+  function addMessageToChatArea (x_coord, y_coord, value, username) {
+    var element = '<div id="newMsg">' + username + ': ' + value + '</div>';
+    var message = $(element).appendTo($chatArea).css('display', 'none');
+    var dimensions = getElementDimensions(message);
+
+    var style = formatInlineStyle(x_coord, y_coord, dimensions);
+
     //limits the seconds that the messages persists in to 6 seconds
     var msecondsPersist = Math.min(value.length * 400, 5000);
-    $(element).appendTo($chatArea).delay(msecondsPersist).fadeOut();
+    message.css('display', 'inline').attr('style', style).delay(msecondsPersist).fadeOut(300, function () {
+      $(this).remove();
+    });
   }
+
+
 
 
   function formatYTUrl (path) {
@@ -62,7 +116,9 @@ $(function() {
       removeNewInputElement();
       x_coordinate = e.pageX;
       y_coordinate = e.pageY;
-      addInputToChatArea(formatInlineStyle(x_coordinate, y_coordinate));
+      // var changeLater = preventInputOverflow([x_coordinate, y_coordinate]);
+      addInputToChatArea(x_coordinate, y_coordinate);
+
       $('#newInput').focus();
     });
 
@@ -105,7 +161,7 @@ $(function() {
           var value = $('#newInput').val();
           if (value.length > 0) {
             if (userJoined) {
-              addMessageToChatArea(formatInlineStyle(x_coordinate, y_coordinate), value, username);
+              addMessageToChatArea(x_coordinate, y_coordinate, value, username);
               removeNewInputElement();
               socket.emit('message sent', {
                 x_coordinate: x_coordinate,

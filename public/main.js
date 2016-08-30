@@ -2,7 +2,7 @@ $(function() {
   var TEXT_AREA_MAXLENGTH = 200;
   var MAXIMUM_MSGINPUT_HEIGHT = 36;
   var MAXIMUM_MSGINPUT_WIDTH = 106;
-
+  var USERNAME_COLORS = ['#FFFFFF', '#800000', '#FF0000', '#808000', '#FFFF00', '#008000', '#00FF00', '#008080', '#00FFFF', '#000080', '#0000FF', '#800080', '#FF00FF'];
 
   // Initialize variables
   var $window = $(window);
@@ -15,6 +15,7 @@ $(function() {
 
   // Prompt for setting a username
   var userJoined = false;
+  var usernameColor;
   var $currentInput = $usernameInput.focus();
   var socket = io();
 
@@ -53,9 +54,11 @@ $(function() {
   }
 
 
-  function formatInlineStyle2 (dimensionsArray, percentagesArray) {
+  function formatInlineStyle2 (dimensionsArray, percentagesArray, color) {
+    var extra = ', -1px -1px 0 #000, 1px -1px 0 #000,-1px  1px 0 #000, 1px  1px 0 #000; font-family:Arial; '
     var inlinePositioning = preventInputOverflow2(dimensionsArray, percentagesArray);
-    return 'position:absolute; ' + inlinePositioning;
+    var messageColor = color || usernameColor;
+    return 'font-size:18px; text-shadow:0px 0px 10px #fff' + extra + 'font-family:Verdana, Geneva, sans-serif; color:' + messageColor + '; position:absolute; ' + inlinePositioning;
   }
 
   function preventInputOverflow2 (elementDimensionsArray, percentagesArray) {
@@ -108,14 +111,15 @@ $(function() {
 
   }
 
-  function addMessageToChatArea (percentages, value, username) {
+  function addMessageToChatArea (percentages, value, username, color) {
     // var x_offsetPercent = percentages[0];
     // var y_offsetPercent = percentages[1];
     var element = '<div id="newMsg">' + username + ': ' + value + '</div>';
     var message = $(element).appendTo($chatArea).css('display', 'none');
     var dimensions = getElementDimensions(message);
 
-    var style = formatInlineStyle2(dimensions, percentages);
+
+    var style = formatInlineStyle2(dimensions, percentages, color);
 
     //limits the seconds that the messages persists in to 6 seconds
     var msecondsPersist = Math.min(value.length * 400, 5000);
@@ -128,12 +132,16 @@ $(function() {
 
 
   function formatYTUrl (path) {
-      return '//www.youtube.com/embed/' + path + '?autoplay=1&controls=0';
+      return '//www.youtube.com/embed/' + path + '?rel=0&autoplay=1&controls=0';
   }
 
   function ytUrlIdentification(url) {
     var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
     return (url.match(p)) ? RegExp.$1 : false;
+  }
+
+  function getRandomUsernameColor() {
+    return USERNAME_COLORS[Math.floor(Math.random() * USERNAME_COLORS.length)];
   }
 
   //main functionalities of user in chatroom
@@ -167,26 +175,18 @@ $(function() {
       }
     });
 
-    $('.usernameInput').focusin(function() {
-      if(event.which === 13) {
-        var value = $usernameInput.val();
-        if (value.length > 0) {
-          username = $usernameInput.val();
-          socket.emit('user joined', username);
-          $loginPage.fadeOut();
-          userJoined = true;
-        }
-      }
-    });
-
 
     $window.keydown(function (event) {
       if (!userJoined) {
         if(event.which === 13) {
           var value = $usernameInput.val();
           if (value.length > 0) {
+            usernameColor = getRandomUsernameColor();
             username = $usernameInput.val();
-            socket.emit('user joined', username);
+            socket.emit('user joined', {
+              username: username,
+              color: usernameColor
+            });
             $loginPage.fadeOut();
             // $currentInput = $newInput.focus();
             userJoined = true;
@@ -203,7 +203,8 @@ $(function() {
               socket.emit('message sent', {
                 percentages: percentagesArray,
                 value: value,
-                username: username
+                username: username,
+                color: usernameColor
               });
             }
           }
@@ -213,12 +214,14 @@ $(function() {
   });
 
   socket.on('message received', function (data) {
-    addMessageToChatArea(data.percentages, data.value, data.username)
+    addMessageToChatArea(data.percentages, data.value, data.username, data.color);
   });
 
   socket.on('user joined', function (data) {
-    var message = data.username + ' has joined!';
+    var message = '<b style="color:' + data.color + ';">' + data.username + '</b> has joined!';
+    console.log('MESSAGE WITH COLOR COLOR', message);
     updateParticipantNum(data.participantNum);
+
     $logs.append('<li>' + message + '</li>');
   });
 

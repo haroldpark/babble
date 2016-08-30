@@ -3,37 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <title>youtube-watch</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="styles.css"/>
+  <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
 </head>
 <body>
     <div class="chatPage">
       <div class="chatArea">
-        <span style="position: absolute; left:50%; background-color: red">helloo there</span>
-        <iframe width="100%" height="100%" frameborder="0" src="">
+        <iframe scrolling="no" frameborder="0" src="">
         </iframe>
       </div>
 
       <div class="logArea">
+        <div class="numOfUsersContainer">
+          <b id="logo">Babble</b>
+          <b># of users in this chat:  </b><b id="numOfUsers"></b>
+        </div>
         <ul class="logs">
-          <li># of users in this chat:</li><p id="numOfUsers"></p>
+
         </ul>
         <div class="ytUrlContainer">
-          Watch something new:
+          <b>Watch something new:</b>
           <input class="ytUrlInput" placeholder="Enter youtube URL"/><button id="sendYtUrl">Submit</button>
         </div>
       </div>
     </div>
     <div class="loginPage">
+      <div class="pageInfo">
+        <span>Welcome to</span>
+        <b id="logo">Babble</b>
+        <div>
+          <span><img src="http://logok.org/wp-content/uploads/2014/08/YouTube-logo-play-icon.png"/>  Watch Youtube videos with new friends!</span>
+        </div>
+      </div>
+
       <div class="form">
-        <h3 class="title">Type in your username</h3>
-        <input class="usernameInput" maxlength="16" type="text" maxlength="14" />
+        <span class="formPrompt">Type in your username to enter:</span>
+        <input class="usernameInput" type="text" maxlength="14" />
       </div>
     </div>
 
 
 
 </body>
-  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="./bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="/main.js"></script>
 </html>

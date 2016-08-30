@@ -21,17 +21,17 @@ if (participantNum == 0) {
 io.on('connection', function (socket) {
   socket.emit('connected');
 
-  socket.on('user joined', function (username) {
+  socket.on('user joined', function (userProps) {
     ++participantNum;
     userAdded = true;
-    socket.username = username;
+    socket.username = userProps.username;
+    socket.color = userProps.color;
     socket.emit('entered room', participantNum);
     if (youtubeURL) {
       var newYoutubeURL = youtubeURL + '&start=' + counter;
-      console.log(newYoutubeURL);
       socket.emit('url received', newYoutubeURL);
     }
-    socket.broadcast.emit('user joined', {username: username, participantNum: participantNum});
+    socket.broadcast.emit('user joined', {username: socket.username, color: socket.color, participantNum: participantNum});
   })
 
   socket.on('message sent', function (messageProps) {

@@ -14,10 +14,12 @@ var participantNum = 0;
 var userAdded = false;
 var youtubeURL;
 var counter = 0;
+if (participantNum == 0) {
+  youtubeURL = null;
+}
 
 io.on('connection', function (socket) {
   socket.emit('connected');
-
 
   socket.on('user joined', function (username) {
     ++participantNum;
@@ -35,6 +37,7 @@ io.on('connection', function (socket) {
   socket.on('message sent', function (messageProps) {
     socket.broadcast.emit('message received', messageProps);
   })
+
   socket.on('url sent', function (url) {
     counter = 0;
     youtubeURL = url;
@@ -43,7 +46,6 @@ io.on('connection', function (socket) {
       counter++
     }, 1000);
   })
-
 
   socket.on('disconnect', function () {
     if (userAdded) {

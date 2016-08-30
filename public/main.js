@@ -126,8 +126,10 @@ $(function() {
       var validatedPath = ytUrlIdentification($('.ytUrlInput').val());
       if (validatedPath) {
         var formattedUrl = formatYTUrl(validatedPath);
-        $('iframe').attr('src', formattedUrl);
+        socket.emit('url sent', formattedUrl);
         $('.ytUrlInput').val('');
+        // $('iframe').attr('src', formattedUrl);
+        // $('.ytUrlInput').val('');
       }
     });
 
@@ -185,6 +187,10 @@ $(function() {
     updateParticipantNum(data.participantNum);
     $logs.append('<li>' + message + '</li>');
   });
+
+  socket.on('url received', function (ytUrl) {
+    $('iframe').attr('src', ytUrl);
+  })
 
   socket.on('user left', function (data) {
     var message = data.username + ' has left!';

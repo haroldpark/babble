@@ -58,7 +58,7 @@ $(function() {
     var extra = ', -1px -1px 0 #000, 1px -1px 0 #000,-1px  1px 0 #000, 1px  1px 0 #000; font-family:Arial; '
     var inlinePositioning = preventInputOverflow2(dimensionsArray, percentagesArray);
     var messageColor = color || usernameColor;
-    return 'font-size:18px; text-shadow:0px 0px 10px #fff' + extra + 'font-family:Verdana, Geneva, sans-serif; color:' + messageColor + '; position:absolute; ' + inlinePositioning;
+    return 'font-size:18px; text-shadow:0px 0px 50px #fff' + extra + 'font-family:Verdana, Geneva, sans-serif; color:' + messageColor + '; position:absolute; ' + inlinePositioning;
   }
 
   function preventInputOverflow2 (elementDimensionsArray, percentagesArray) {
@@ -93,17 +93,24 @@ $(function() {
 
   //To account for different viewports of clients, we get the coordinates in percentages relative to the container dimensions
   function getCoordinatesByPercentage (x_coord, y_coord) {
+    console.log('HELLO THERE', $chatArea.offset())
+    y_coord = considerChatAreaOffsetY(y_coord);
     var x_percentage = x_coord/$chatArea.outerWidth() * 100;
     var y_percentage = y_coord/$chatArea.outerHeight() * 100;
     return [x_percentage, y_percentage];
   }
 
-
+  function considerChatAreaOffsetY (y_coord) {
+      return y_coord - $chatArea.offset().top;
+  }
   function addInputToChatArea (x_coord, y_coord) {
+
     //Checks if click coordinates are in the zone where overflow may happen
     var element = '<textarea id="newInput" maxlength="' + TEXT_AREA_MAXLENGTH + '"/>';
     var input = $(element).appendTo($chatArea).css('display', 'none');
     var dimensions = getElementDimensions(input);
+
+    y_coord = considerChatAreaOffsetY(y_coord);
 
     var style = formatInlineStyle(x_coord, y_coord, dimensions);
 
@@ -114,7 +121,7 @@ $(function() {
   function addMessageToChatArea (percentages, value, username, color) {
     // var x_offsetPercent = percentages[0];
     // var y_offsetPercent = percentages[1];
-    var element = '<div id="newMsg">' + username + ': ' + value + '</div>';
+    var element = '<div id="newMsg"><b>' + username + ':</b> ' + value + '</div>';
     var message = $(element).appendTo($chatArea).css('display', 'none');
     var dimensions = getElementDimensions(message);
 

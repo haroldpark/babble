@@ -5,7 +5,8 @@ html, body {
   font-family: 'Josefin Sans', sans-serif;
 }
 
-li {
+ul {
+  padding: 0;
   list-style: none;
 }
 
@@ -48,8 +49,6 @@ li {
   font-style: italic;
 }
 
-
-
 .pageInfo {
   padding: 10% 0 10% 0;
 }
@@ -78,57 +77,70 @@ li {
   display: inline-block;
   width: 100%;
   height: 100%;
-  top: 0;
-  left: 0;
+  background-color: black;
+  /*top: 0;
+  left: 0;*/
 }
 
 .chatArea {
   float: left;
   width: 80%;
-  height: 100%;
-  top: 0;
-  left: 0;
+  /*height: 100%;*/
   position: relative;
   overflow: hidden;
+  padding-bottom: 28.25%;
+  padding-top: 28%;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 0;
 }
 
+
+
+
 iframe {
+  /*background-color: blue;*/
+
   pointer-events: none;
   border: none;
-  z-index: -1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  /*z-index: -1;*/
   width: 100%;
+  /*max-width: 100%;*/
   height: 100%;
-  overflow: hidden;
+  /*overflow: hidden;*/
 }
 
 .numOfUsersContainer {
   text-align: center;
+
 }
 
 .numOfUsersContainer b {
   font-size: 15px;
 }
 
+.logsContainer {
+  overflow-y: auto;
+  height: 60%;
+  max-height: 60%;
+}
+
 .logArea {
-  float: right;
+  float: left;
   width: 20%;
   height: 100%;
-  display: inline-block;
-
-  border-left: 2px outset;
+  /*display: inline-block;*/
+  position: relative;
+  /*border-left: 2px outset;*/
   /*margin: -2px 0px -2px 0px;*/
+  background-color: white;
 }
 
 .logArea #logo {
   font-size: 40px;
-}
-
-.logs {
-  padding: 0px;
-}
-
-.logs {
-
 }
 
 .logs li, #numOfUsers {
@@ -139,11 +151,12 @@ iframe {
   position: absolute;
   bottom: 0;
   text-align: center;
-  padding: 10px;
+  padding: 10px 0 10px 0;
 }
 
 .ytUrlInput {
-  box-sizing: border-box;
+  /*box-sizing: border-box;*/
+  width: 80%;
   display: inline-block;
 }
 
@@ -151,6 +164,18 @@ iframe {
   width: 100px;
   word-wrap: break-word;
 }
+
+/*.logs {
+  padding: 0px;
+}*/
+
+
+
+
+
+
+
+
 
 /*#example {
   position: absolute;

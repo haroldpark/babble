@@ -19,6 +19,25 @@ $(function() {
   var $currentInput = $usernameInput.focus();
   var socket = io();
 
+
+  //refactor this
+  $(window).resize(determineChatAreaProportions);
+
+  function determineChatAreaProportions () {
+      var iframeheight = $('.iframe-full-height').height();
+      var windowHeight = $(window).height();
+      if (iframeheight !== windowHeight) {
+        $('.chatArea').css('top', '50%').css('transform', 'translateY(-50%)');
+      }
+      else {
+        $('.chatArea').css('top', '').css('transform', '');
+      }
+  }
+
+  $('.iframe-full-height').on('load', determineChatAreaProportions);
+
+
+
   function updateParticipantNum (number) {
     $('#numOfUsers').text(number);
   }
@@ -93,7 +112,6 @@ $(function() {
 
   //To account for different viewports of clients, we get the coordinates in percentages relative to the container dimensions
   function getCoordinatesByPercentage (x_coord, y_coord) {
-    console.log('HELLO THERE', $chatArea.offset())
     y_coord = considerChatAreaOffsetY(y_coord);
     var x_percentage = x_coord/$chatArea.outerWidth() * 100;
     var y_percentage = y_coord/$chatArea.outerHeight() * 100;
@@ -129,7 +147,7 @@ $(function() {
     var style = formatInlineStyle2(dimensions, percentages, color);
 
     //limits the seconds that the messages persists in to 6 seconds
-    var msecondsPersist = Math.min(value.length * 400, 5000);
+    var msecondsPersist = Math.max(Math.min(value.length * 400, 5000), 3000);
     message.css('display', 'inline').attr('style', style).delay(msecondsPersist).fadeOut(300, function () {
       $(this).remove();
     });

@@ -3,6 +3,7 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: 'Josefin Sans', sans-serif;
+  overflow: hidden;
 }
 
 ul {
@@ -88,19 +89,15 @@ ul {
   /*height: 100%;*/
   position: relative;
   overflow: hidden;
-  padding-bottom: 28.25%;
-  padding-top: 28%;
-  top: 50%;
-  transform: translateY(-50%);
+  padding-bottom: 56.25%;
+  padding-top: 25px;
+
+  /*left:50%;
+  transform: translateX(-50%);*/
   height: 0;
 }
 
-
-
-
 iframe {
-  /*background-color: blue;*/
-
   pointer-events: none;
   border: none;
   position: absolute;
@@ -108,8 +105,11 @@ iframe {
   left: 0;
   /*z-index: -1;*/
   width: 100%;
-  /*max-width: 100%;*/
+  max-width: calc(100vw - 20%);
   height: 100%;
+  max-height: 100vh;
+  /*top: 50%;
+  transform: translateY(-50%);*/
   /*overflow: hidden;*/
 }
 
@@ -124,8 +124,8 @@ iframe {
 
 .logsContainer {
   overflow-y: auto;
-  height: 60%;
-  max-height: 60%;
+  /*height of logcontainer minus heights of numOfUsersContainer and ytUrlContainer*/
+  height: calc(100% - 90px - 78px);
 }
 
 .logArea {
@@ -163,6 +163,16 @@ iframe {
 #newInput, #newMsg {
   width: 100px;
   word-wrap: break-word;
+}
+
+#newInput {
+  border: 6px solid;
+  border-color: steelblue;
+  border-radius: 14px;
+}
+
+#newInput:focus {
+  outline: none;
 }
 
 /*.logs {

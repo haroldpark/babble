@@ -3,18 +3,20 @@ $(function() {
   var MAXIMUM_MSGINPUT_HEIGHT = 36;
   var MAXIMUM_MSGINPUT_WIDTH = 106;
   var USERNAME_COLORS = ['#FFFFFF', '#800000', '#FF0000', '#808000', '#FFFF00', '#008000', '#00FF00', '#008080', '#00FFFF', '#000080', '#0000FF', '#800080', '#FF00FF'];
+  var MS_BY_MESSAGELENGTH_PERSIST = 400;
+  var MAXIMUM_MS_MSG_PERSIST = 6000;
+  var MINIMUM_MS_MSG_PERSIST = 3000;
 
   // Initialize variables
   var $window = $(window);
   var $usernameInput = $('.usernameInput'); // Input for username
   var $messages = $('.messages'); // Messages area
-  var $newInput = $('#newInput'); // Input box that appears on screen on click
+  var $newMsgInput = $('#newMsgInput'); // Input box that appears on screen on click
   var $loginPage = $('.loginPage'); // The login page
   var $chatArea = $('.chatArea'); // The chatroom page
   var $logs = $('.logs');
 
   // Prompt for setting a username
-  var userJoined = false;
   var usernameColor;
   var $currentInput = $usernameInput.focus();
   var socket = io();
@@ -36,14 +38,49 @@ $(function() {
 
   $('.iframe-full-height').on('load', determineChatAreaProportions);
 
-
-
   function updateParticipantNum (number) {
     $('#numOfUsers').text(number);
   }
 
-  function removeNewInputElement () {
-    $('#newInput').remove();
+  //Login page methods
+  function initializeLoginPage () {
+    $('.usernameInput').focus();
+  }
+
+  function getRandomUsernameColor() {
+    return USERNAME_COLORS[Math.floor(Math.random() * USERNAME_COLORS.length)];
+  }
+
+  //ChatArea methods
+  function removeExisitingInputElement () {
+    $('#newMsgInput').remove();
+  }
+
+  function addInputToChatArea (x_coord, y_coord) {
+    //Checks if click coordinates are in the zone where overflow may happen
+    var element = '<textarea id="newMsgInput" maxlength="' + TEXT_AREA_MAXLENGTH + '"/>';
+    var input = $(element).appendTo($chatArea).css('display', 'none');
+    var dimensions = getElementDimensions(input);
+    y_coord = considerChatAreaOffsetY(y_coord);
+    var style = formatInlineStyle(x_coord, y_coord, dimensions);
+    input.css('display', 'inline').attr('style', style);
+  }
+
+  function addMessageToChatArea (percentages, value, username, color) {
+    var element = '<div id="newMsg"><b>' + username + ':</b> ' + value + '</div>';
+    var message = $(element).appendTo($chatArea).css('display', 'none');
+    var dimensions = getElementDimensions(message);
+    var style = formatInlineStyle2(dimensions, percentages, color);
+
+    //limits the seconds that the messages persists in to 6 seconds
+    var msecondsPersist = getMessagePersistByMilliseconds(value.length);
+    message.css('display', 'inline').attr('style', style).delay(msecondsPersist).fadeOut(300, function () {
+      $(this).remove();
+    });
+  }
+
+  function getMessagePersistByMilliseconds (msgLength) {
+    return Math.max(Math.min(msgLength * MS_BY_MESSAGELENGTH_PERSIST, MAXIMUM_MS_MSG_PERSIST), MINIMUM_MS_MSG_PERSIST);
   }
 
   function formatInlineStyle (x_coord, y_coord, dimensionsArray) {
@@ -68,7 +105,6 @@ $(function() {
     if (heightOverflow) {
       return 'bottom: 0px; left: ' + x_coord + 'px';
     }
-
     return 'left:' + x_coord + 'px; top:' + y_coord + 'px';
   }
 
@@ -89,8 +125,6 @@ $(function() {
     var clientYCoordinate = percentagesArray[1] / 100 * chatAreaHeight;
     var widthOverflow = clientXCoordinate + elementWidth > chatAreaWidth;
     var heightOverflow = clientYCoordinate + elementHeight > chatAreaHeight;
-
-
     if (widthOverflow && heightOverflow) {
       return 'bottom: 0px; right: 0px;';
     }
@@ -110,64 +144,38 @@ $(function() {
     return [elementWidth, elementHeight];
   }
 
-  //To account for different viewports of clients, we get the coordinates in percentages relative to the container dimensions
+
   function getCoordinatesByPercentage (x_coord, y_coord) {
+    //To account for different viewports of clients, we get the coordinates in percentages relative to the container dimensions
     y_coord = considerChatAreaOffsetY(y_coord);
     var x_percentage = x_coord/$chatArea.outerWidth() * 100;
     var y_percentage = y_coord/$chatArea.outerHeight() * 100;
     return [x_percentage, y_percentage];
   }
 
+
   function considerChatAreaOffsetY (y_coord) {
       return y_coord - $chatArea.offset().top;
   }
-  function addInputToChatArea (x_coord, y_coord) {
 
-    //Checks if click coordinates are in the zone where overflow may happen
-    var element = '<textarea id="newInput" maxlength="' + TEXT_AREA_MAXLENGTH + '"/>';
-    var input = $(element).appendTo($chatArea).css('display', 'none');
-    var dimensions = getElementDimensions(input);
 
-    y_coord = considerChatAreaOffsetY(y_coord);
 
-    var style = formatInlineStyle(x_coord, y_coord, dimensions);
 
-    input.css('display', 'inline').attr('style', style);
-
+  //Video url methods
+  function resetVideoUrlInput () {
+    $('.videoUrlInput').val('');
   }
 
-  function addMessageToChatArea (percentages, value, username, color) {
-    // var x_offsetPercent = percentages[0];
-    // var y_offsetPercent = percentages[1];
-    var element = '<div id="newMsg"><b>' + username + ':</b> ' + value + '</div>';
-    var message = $(element).appendTo($chatArea).css('display', 'none');
-    var dimensions = getElementDimensions(message);
-
-
-    var style = formatInlineStyle2(dimensions, percentages, color);
-
-    //limits the seconds that the messages persists in to 6 seconds
-    var msecondsPersist = Math.max(Math.min(value.length * 400, 5000), 3000);
-    message.css('display', 'inline').attr('style', style).delay(msecondsPersist).fadeOut(300, function () {
-      $(this).remove();
-    });
-  }
-
-
-
-
-  function formatYTUrl (path) {
+  function formatVideoUrl (path) {
       return '//www.youtube.com/embed/' + path + '?rel=0&autoplay=1&controls=0';
   }
 
-  function ytUrlIdentification(url) {
+  function videoUrlIdentification(url) {
     var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
     return (url.match(p)) ? RegExp.$1 : false;
   }
 
-  function getRandomUsernameColor() {
-    return USERNAME_COLORS[Math.floor(Math.random() * USERNAME_COLORS.length)];
-  }
+
 
   //main functionalities of user in chatroom
   socket.on('entered room', function (number) {
@@ -179,63 +187,70 @@ $(function() {
     var y_coordinate;
     var username;
 
-    $('.chatArea').click(function (e) {
-      removeNewInputElement();
-      x_coordinate = e.pageX;
-      y_coordinate = e.pageY;
-      // var changeLater = preventInputOverflow([x_coordinate, y_coordinate]);
-      addInputToChatArea(x_coordinate, y_coordinate);
+    initializeLoginPage();
 
-      $('#newInput').focus();
-    });
-
-    $('#sendYtUrl').click(function () {
-      var validatedPath = ytUrlIdentification($('.ytUrlInput').val());
-      if (validatedPath) {
-        var formattedUrl = formatYTUrl(validatedPath);
-        socket.emit('url sent', formattedUrl);
-        $('.ytUrlInput').val('');
-        // $('iframe').attr('src', formattedUrl);
-        // $('.ytUrlInput').val('');
-      }
-    });
-
-
-    $window.keydown(function (event) {
-      if (!userJoined) {
-        if(event.which === 13) {
-          var value = $usernameInput.val();
-          if (value.length > 0) {
-            usernameColor = getRandomUsernameColor();
+    if($('.loginPage')) {
+      $('.loginPage').keydown(function (event) {
+          if(event.which === 13) {
             username = $usernameInput.val();
-            socket.emit('user joined', {
-              username: username,
-              color: usernameColor
-            });
-            $loginPage.fadeOut();
-            // $currentInput = $newInput.focus();
-            userJoined = true;
-          }
-        }
-      } else {
-        if(event.which === 13) {
-          var value = $('#newInput').val();
-          if (value.length > 0) {
-            if (userJoined) {
-              var percentagesArray = getCoordinatesByPercentage(x_coordinate, y_coordinate);
-              addMessageToChatArea(percentagesArray, value, username);
-              removeNewInputElement();
-              socket.emit('message sent', {
-                percentages: percentagesArray,
-                value: value,
+            if (username.length > 0) {
+              usernameColor = getRandomUsernameColor();
+              socket.emit('user joined', {
                 username: username,
                 color: usernameColor
               });
+              $loginPage.fadeOut();
             }
           }
+      });
+    }
+
+    $('.chatArea').click(function (e) {
+      removeExisitingInputElement();
+      x_coordinate = e.pageX;
+      y_coordinate = e.pageY;
+      addInputToChatArea(x_coordinate, y_coordinate);
+      $('#newMsgInput').focus();
+    });
+
+    $('.chatArea').on('focus', '#newMsgInput', function () {
+      $(this).keydown(function (event) {
+        if(event.which === 13) {
+          var message = $('#newMsgInput').val();
+          if (message.length > 0) {
+              var percentagesArray = getCoordinatesByPercentage(x_coordinate, y_coordinate);
+              console.log(username)
+              addMessageToChatArea(percentagesArray, message, username);
+              removeExisitingInputElement();
+              socket.emit('message sent', {
+                percentages: percentagesArray,
+                value: message,
+                username: username,
+                color: usernameColor
+              });
+          }
         }
+      });
+    });
+
+    $('#sendYtUrl').on('click', function () {
+      var userInputUrl = $('.videoUrlInput').val();
+      var validatedPath = videoUrlIdentification(userInputUrl);
+      if (validatedPath) {
+        var formattedUrl = formatVideoUrl(validatedPath);
+        socket.emit('url sent', formattedUrl);
+        resetVideoUrlInput();
       }
-    })
+      else {
+        //ALERT USER
+      }
+    });
+
+
+
+
+
+
   });
 
   socket.on('message received', function (data) {
@@ -244,14 +259,13 @@ $(function() {
 
   socket.on('user joined', function (data) {
     var message = '<b style="color:' + data.color + ';">' + data.username + '</b> has joined!';
-    console.log('MESSAGE WITH COLOR COLOR', message);
     updateParticipantNum(data.participantNum);
 
     $logs.append('<li>' + message + '</li>');
   });
 
-  socket.on('url received', function (ytUrl) {
-    $('iframe').attr('src', ytUrl);
+  socket.on('url received', function (vidUrl) {
+    $('iframe').attr('src', vidUrl);
   })
 
   socket.on('user left', function (data) {

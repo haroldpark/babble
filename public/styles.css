@@ -154,24 +154,24 @@ iframe {
   padding: 10px 0 10px 0;
 }
 
-.ytUrlInput {
+.videoUrlInput {
   /*box-sizing: border-box;*/
   width: 80%;
   display: inline-block;
 }
 
-#newInput, #newMsg {
+#newMsgInput, #newMsg {
   width: 100px;
   word-wrap: break-word;
 }
 
-#newInput {
-  border: 6px solid;
+#newMsgInput {
+  border: 4px solid;
   border-color: steelblue;
   border-radius: 14px;
 }
 
-#newInput:focus {
+#newMsgInput:focus {
   outline: none;
 }
 
@@ -196,7 +196,7 @@ iframe {
 
 
 
-#newInput {
+#newMsgInput {
   resize: vertical;
   max-height: 100px;
 }

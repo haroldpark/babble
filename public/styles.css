@@ -35,13 +35,6 @@ ul {
 
 }
 
-/*.loginPage:before {
-  content: '';
-  display: inline-block;
-  vertical-align: middle;
-  height: 100%;
-}*/
-
 #logo {
   display: block;
   font-family: 'bubble letters', sans-serif;
@@ -51,9 +44,17 @@ ul {
 }
 
 .pageInfo {
+  /*height: 70%;
   padding: 10% 0 10% 0;
+  position: relative;*/
+  margin-top: 100px;
+}
+
+.pageInfo div {
+  /*position: relative;*/
 }
 .pageInfo img {
+  /*top: 50%;*/
   width: 20%;
   height: auto;
 }
@@ -64,8 +65,10 @@ ul {
 }
 
 .form {
-  display: block;
+  /*display: block;
   font-size: 20px;
+  height: 30%;*/
+  text-align: center;
 }
 
 .formPrompt {
@@ -115,7 +118,8 @@ iframe {
 
 .numOfUsersContainer {
   text-align: center;
-
+  z-index: 5;
+  background-color: white;
 }
 
 .numOfUsersContainer b {
@@ -152,6 +156,7 @@ iframe {
   bottom: 0;
   text-align: center;
   padding: 10px 0 10px 0;
+  z-index: 0;
 }
 
 .videoUrlInput {

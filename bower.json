@@ -5,6 +5,7 @@
     "bower_components"
   ],
   "dependencies": {
-    "bootstrap": "^3.3.7"
+    "bootstrap": "^3.3.7",
+    "remarkable-bootstrap-notify": "^3.1.3"
   }
 }

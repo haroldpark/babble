@@ -1,11 +1,12 @@
 $(function() {
-  var TEXT_AREA_MAXLENGTH = 200;
   var MAXIMUM_MSGINPUT_HEIGHT = 36;
   var MAXIMUM_MSGINPUT_WIDTH = 106;
   var USERNAME_COLORS = ['#FFFFFF', '#800000', '#FF0000', '#808000', '#FFFF00', '#008000', '#00FF00', '#008080', '#00FFFF', '#000080', '#0000FF', '#800080', '#FF00FF'];
   var MS_BY_MESSAGELENGTH_PERSIST = 400;
   var MAXIMUM_MS_MSG_PERSIST = 6000;
   var MINIMUM_MS_MSG_PERSIST = 3000;
+  var MAXIMUM_USERNAME_LENGTH = 14;
+  var MAXIMUM_CHATMESSAGE_LENGTH = 200;
 
   // Initialize variables
   var $window = $(window);
@@ -23,11 +24,15 @@ $(function() {
 
 
   //refactor this
-  $(window).resize(determineChatAreaProportions);
-
+  $(window).resize(function() {
+    determineChatAreaProportions();
+    removeExistingInputElement();
+  });
   function determineChatAreaProportions () {
+
       var iframeheight = $('.iframe-full-height').height();
       var windowHeight = $(window).height();
+      console.log(iframeheight, windowHeight);
       if (iframeheight !== windowHeight) {
         $('.chatArea').css('top', '50%').css('transform', 'translateY(-50%)');
       }
@@ -52,13 +57,13 @@ $(function() {
   }
 
   //ChatArea methods
-  function removeExisitingInputElement () {
+  function removeExistingInputElement () {
     $('#newMsgInput').remove();
   }
 
   function addInputToChatArea (x_coord, y_coord) {
     //Checks if click coordinates are in the zone where overflow may happen
-    var element = '<textarea id="newMsgInput" maxlength="' + TEXT_AREA_MAXLENGTH + '"/>';
+    var element = '<textarea id="newMsgInput" maxlength="' + MAXIMUM_CHATMESSAGE_LENGTH + '"/>';
     var input = $(element).appendTo($chatArea).css('display', 'none');
     var dimensions = getElementDimensions(input);
     y_coord = considerChatAreaOffsetY(y_coord);
@@ -176,6 +181,46 @@ $(function() {
   }
 
 
+  function processVideoUrl() {
+    var userInputUrl = $('.videoUrlInput').val();
+    var validatedPath = videoUrlIdentification(userInputUrl);
+    if (validatedPath) {
+      var formattedUrl = formatVideoUrl(validatedPath);
+      socket.emit('url sent', formattedUrl);
+      resetVideoUrlInput();
+    }
+    else {
+      //ALERT USER
+      createAlert('Invalid Youtube URL', 'top', 'center');
+    }
+  }
+
+  function notifyMessageExists() {
+    return !!$('.alert').length;
+  }
+
+  function createAlert (message, fr, align) {
+    var options = {
+      icon: 'glyphicon glyphicon-warning-sign',
+      message: message
+    }
+    var settings = {
+      type: "warning",
+      placement: {
+        //top or bottom
+        from: fr,
+        //left, center, or right
+        align: align
+      },
+      icon_type: 'class',
+      delay: 100000000
+    };
+    if (!notifyMessageExists()) {
+      $.notify(options, settings);
+    }
+    $('.alert').removeClass('col-xs-11').removeClass('col-sm-4').css('width', '30%');
+  }
+
 
   //main functionalities of user in chatroom
   socket.on('entered room', function (number) {
@@ -189,7 +234,14 @@ $(function() {
 
     initializeLoginPage();
 
+    //functionalities for login page
     if($('.loginPage')) {
+      $('.usernameInput').on('input', function() {
+        if ($(this).val().length == MAXIMUM_USERNAME_LENGTH) {
+          createAlert('Username is too long!', 'bottom', 'center');
+        }
+      })
+
       $('.loginPage').keydown(function (event) {
           if(event.which === 13) {
             username = $usernameInput.val();
@@ -206,7 +258,7 @@ $(function() {
     }
 
     $('.chatArea').click(function (e) {
-      removeExisitingInputElement();
+      removeExistingInputElement();
       x_coordinate = e.pageX;
       y_coordinate = e.pageY;
       addInputToChatArea(x_coordinate, y_coordinate);
@@ -219,9 +271,8 @@ $(function() {
           var message = $('#newMsgInput').val();
           if (message.length > 0) {
               var percentagesArray = getCoordinatesByPercentage(x_coordinate, y_coordinate);
-              console.log(username)
               addMessageToChatArea(percentagesArray, message, username);
-              removeExisitingInputElement();
+              removeExistingInputElement();
               socket.emit('message sent', {
                 percentages: percentagesArray,
                 value: message,
@@ -230,26 +281,24 @@ $(function() {
               });
           }
         }
+        else {
+          var message = $('#newMsgInput').val();
+          if (message.length == MAXIMUM_CHATMESSAGE_LENGTH) {
+            createAlert('Your message is too long!', 'top', 'center');
+          }
+        }
       });
     });
 
-    $('#sendYtUrl').on('click', function () {
-      var userInputUrl = $('.videoUrlInput').val();
-      var validatedPath = videoUrlIdentification(userInputUrl);
-      if (validatedPath) {
-        var formattedUrl = formatVideoUrl(validatedPath);
-        socket.emit('url sent', formattedUrl);
-        resetVideoUrlInput();
-      }
-      else {
-        //ALERT USER
-      }
+    $('#sendYtUrl').on('click', processVideoUrl);
+
+    $('.videoUrlInput').on('focus', function () {
+      $(this).keydown(function (event) {
+        if(event.which === 13) {
+          processVideoUrl();
+        }
+      });
     });
-
-
-
-
-
 
   });
 

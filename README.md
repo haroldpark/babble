@@ -3,6 +3,7 @@ A chatroom web application that allows users to watch videos together while send
 
 ## Installation
 ```
+git clone https://github.com/haroldpark/babble.git
 cd babble
 npm install
 ```

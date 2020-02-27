@@ -1,3 +1,3 @@
-# Blabber
+# Babble
 
-Blabber is a chatroom web application that allows users to watch videos together while sending message on the video.
+Babble is a chatroom web application that allows users to watch videos together while sending message on the video.
